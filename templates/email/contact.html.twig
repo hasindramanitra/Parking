@@ -1,0 +1,15 @@
+<p>
+    A New contact request have been received.
+</p>
+
+<ul>
+    <li>Nom: {{ data.firstname ~ data.lastname}}</li>
+    <li>Email: {{data.email}}</li>
+</ul>
+
+<h3>Subject: {{data.subject}}</h3>
+
+<p>
+    <strong>Message:</strong><br/>
+    {{ data.message | nl2br}}
+</p>
