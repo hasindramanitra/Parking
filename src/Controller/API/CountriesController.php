@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CountriesController extends AbstractController
@@ -25,7 +25,7 @@ class CountriesController extends AbstractController
 
    #[Route('/countrie-management/countries', name: 'countries.all', methods: ['GET'])]
     public function getAllCountries(
-        SerializerInterface $serializerInterface
+
     ): JsonResponse
     {
         $countries = $this->countriesRepository->findAll();
@@ -38,8 +38,13 @@ class CountriesController extends AbstractController
             ]);
         }
 
-        $jsonCountries = $serializerInterface->serialize($countries, 'json');
-        return new JsonResponse($jsonCountries, JsonResponse::HTTP_OK, [], true);
+
+        //return new JsonResponse($jsonCountries, JsonResponse::HTTP_OK, [], true);
+        return $this->json([
+            'Countries'=>$countries
+        ], 200, [], [ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => function($object){
+            return $object->getId();
+        }]);
     }
 
     #[Route('/countrie-management/countries', name: 'countries.create', methods:'POST')]
@@ -113,7 +118,7 @@ class CountriesController extends AbstractController
         $this->em->persist($countrieFindById);
         $this->em->flush();
         return new JsonResponse([
-            'status'=> JsonResponse::HTTP_CREATED,
+            'status'=> JsonResponse::HTTP_OK,
             'message' => 'Countrie updated successfully.'
         ]
         );
