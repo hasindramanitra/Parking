@@ -131,7 +131,7 @@ class CategoryController extends AbstractController
         $this->em->persist($categoryFindById);
         $this->em->flush();
         return new JsonResponse([
-            'status'=> JsonResponse::HTTP_CREATED,
+            'status'=> JsonResponse::HTTP_OK,
             'message' => 'Category updated successfully.'
         ]
         );
