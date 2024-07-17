@@ -17,7 +17,10 @@ class Category
     private ?string $name = null;
 
     #[ORM\Column]
-    private ?float $size = null;
+    private ?float $width = null;
+
+    #[ORM\Column]
+    private ?float $length = null;
 
     public function getId(): ?int
     {
@@ -36,14 +39,26 @@ class Category
         return $this;
     }
 
-    public function getSize(): ?float
+    public function getWidth(): ?float
     {
-        return $this->size;
+        return $this->width;
     }
 
-    public function setSize(float $size): static
+    public function setWidth(float $width): static
     {
-        $this->size = $size;
+        $this->width = $width;
+
+        return $this;
+    }
+
+    public function getLength(): ?float
+    {
+        return $this->length;
+    }
+
+    public function setLength(float $length): static
+    {
+        $this->length = $length;
 
         return $this;
     }
