@@ -16,15 +16,16 @@ class ParkingSpace
     #[ORM\Column]
     private ?bool $avalaibilityStatus = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $type = null;
-
     #[ORM\Column]
     private ?float $rate = null;
 
     #[ORM\ManyToOne(inversedBy: 'parkingSpaces')]
     #[ORM\JoinColumn(nullable: false)]
     private ?ParkingFloor $parkingFloor = null;
+
+    #[ORM\ManyToOne(inversedBy: 'parkingSpaces')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Category $Categorie = null;
 
     public function getId(): ?int
     {
@@ -39,18 +40,6 @@ class ParkingSpace
     public function setAvalaibilityStatus(bool $avalaibilityStatus): static
     {
         $this->avalaibilityStatus = $avalaibilityStatus;
-
-        return $this;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): static
-    {
-        $this->type = $type;
 
         return $this;
     }
@@ -75,6 +64,18 @@ class ParkingSpace
     public function setParkingFloor(?ParkingFloor $parkingFloor): static
     {
         $this->parkingFloor = $parkingFloor;
+
+        return $this;
+    }
+
+    public function getCategorie(): ?Category
+    {
+        return $this->Categorie;
+    }
+
+    public function setCategorie(?Category $Categorie): static
+    {
+        $this->Categorie = $Categorie;
 
         return $this;
     }
