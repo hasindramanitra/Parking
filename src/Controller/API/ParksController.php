@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\API;
 
 use App\Entity\Parks;
@@ -18,48 +19,46 @@ class ParksController extends AbstractController
 
     private $parksRepository;
 
-    public function __construct(EntityManagerInterface $em, ParksRepository $parksRepository) {
-        
+    public function __construct(EntityManagerInterface $em, ParksRepository $parksRepository)
+    {
+
         $this->em = $em;
 
         $this->parksRepository = $parksRepository;
     }
 
     #[Route('/parkings-management/parkings', name: 'parkings.all', methods: ['GET'])]
-    public function getAllParks(
-
-    ): JsonResponse
+    public function getAllParks(): JsonResponse
     {
         $parkings = $this->parksRepository->findAll();
 
-        if(!$parkings){
+        if (!$parkings) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_NO_CONTENT,
-                'message'=> 'No parking found in database.'
+                'status' => JsonResponse::HTTP_NO_CONTENT,
+                'message' => 'No parking found in database.'
             ]);
         }
 
         $allParkings = [];
 
-        foreach($parkings as $parking){
+        foreach ($parkings as $parking) {
             $allParkings[] = [
-                'id'=> $parking->getId(),
-                'location'=> $parking->getLocation(),
-                'citie'=>$parking->getCities()?->getCitieName(),
-                'parkingFloor'=> $parking->getParkingFloors()
+                'id' => $parking->getId(),
+                'location' => $parking->getLocation(),
+                'citie' => $parking->getCities()?->getCitieName(),
+                'parkingFloor' => $parking->getParkingFloors()
             ];
         }
 
 
         return new JsonResponse([
-            'status'=> JsonResponse::HTTP_OK,
-            'parkings'=> $allParkings
+            'status' => JsonResponse::HTTP_OK,
+            'parkings' => $allParkings
         ]);
-       
     }
 
-    #[Route('/parkings-management/parkings', name: 'parkings.create', methods:'POST')]
+    #[Route('/parkings-management/parkings', name: 'parkings.create', methods: 'POST')]
     public function new(Request $request, CitiesRepository $citiesRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -69,18 +68,18 @@ class ParksController extends AbstractController
 
         $findCitieById = $citiesRepository->find($citieId);
 
-        if(!$findCitieById){
+        if (!$findCitieById) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'City not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'City not found.'
             ]);
         }
 
-        if(empty($parksLocation)){
+        if (empty($parksLocation)) {
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'Parking Location can not be empty.'
+                'status' => JsonResponse::HTTP_BAD_REQUEST,
+                'message' => 'Parking Location can not be empty.'
             ]);
         }
 
@@ -91,23 +90,23 @@ class ParksController extends AbstractController
 
         $this->em->persist($newParks);
         $this->em->flush();
-        return new JsonResponse([
-            'status'=> JsonResponse::HTTP_CREATED,
-            'message' => 'New parking added successfully.'
-        ]
+        return new JsonResponse(
+            [
+                'status' => JsonResponse::HTTP_CREATED,
+                'message' => 'New parking added successfully.'
+            ]
         );
     }
 
     #[Route('/parkings-management/parkings/12434{id}9909', name: 'parkings.update', methods: ['PUT', 'PATCH'])]
     public function edit(
-        Request $request, 
-        int $id, 
+        Request $request,
+        int $id,
         ParksRepository $parksRepository,
         CitiesRepository $citiesRepository
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $data = json_decode($request->getContent(), true);
-        
+
         $parksLocation = $data['location'];
         $citieId = $data['citie_id'];
 
@@ -115,25 +114,25 @@ class ParksController extends AbstractController
 
         $findCitieById = $citiesRepository->find($citieId);
 
-        if(!$findCitieById){
+        if (!$findCitieById) {
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'City not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'City not found.'
             ]);
         }
 
-        if(!$findParkById){
+        if (!$findParkById) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'ressources not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'ressources not found.'
             ]);
         }
 
-        if(empty($parksLocation)){
+        if (empty($parksLocation)) {
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'Parking location can not be empty.'
+                'status' => JsonResponse::HTTP_BAD_REQUEST,
+                'message' => 'Parking location can not be empty.'
             ]);
         }
 
@@ -143,10 +142,11 @@ class ParksController extends AbstractController
         $this->em->persist($findParkById);
         $this->em->flush();
 
-        return new JsonResponse([
-            'status'=> JsonResponse::HTTP_OK,
-            'message' => 'parking updated successfully.'
-        ]
+        return new JsonResponse(
+            [
+                'status' => JsonResponse::HTTP_OK,
+                'message' => 'parking updated successfully.'
+            ]
         );
     }
 
@@ -154,15 +154,14 @@ class ParksController extends AbstractController
     public function delete(
         int $id,
         ParksRepository $parksRepository
-    ): JsonResponse
-    {
+    ): JsonResponse {
 
         $findParkById = $parksRepository->find($id);
 
-        if(!$findParkById){
+        if (!$findParkById) {
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'ressources not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'ressources not found.'
             ]);
         }
 
@@ -175,6 +174,4 @@ class ParksController extends AbstractController
             'message' => 'ressource deleted successfully.'
         ]);
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\API;
 
 use App\Entity\ParkingFloor;
@@ -24,40 +25,38 @@ class ParkingFloorController extends AbstractController
         $this->parkingFloorRepository = $parkingFloorRepository;
     }
 
-   #[Route('/parking-floor-management/parking-floors', name: 'parking-floors.all', methods: ['GET'])]
-    public function getAllParkingFloor(
-
-    ): JsonResponse
+    #[Route('/parking-floor-management/parking-floors', name: 'parking-floors.all', methods: ['GET'])]
+    public function getAllParkingFloor(): JsonResponse
     {
         $parkingFloors = $this->parkingFloorRepository->findAll();
 
-        if(!$parkingFloors){
+        if (!$parkingFloors) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_NO_CONTENT,
-                'message'=> 'No parking floor found in database.'
+                'status' => JsonResponse::HTTP_NO_CONTENT,
+                'message' => 'No parking floor found in database.'
             ]);
         }
 
         $allParkingFloors = [];
 
-        foreach($parkingFloors as $parkingFloor){
+        foreach ($parkingFloors as $parkingFloor) {
 
             $allParkingFloors[] = [
-                'id'=> $parkingFloor->getId(),
-                'nomination'=> $parkingFloor->getNomination(),
-                'parkingSpaces'=> $parkingFloor->getParkingSpaces()
+                'id' => $parkingFloor->getId(),
+                'nomination' => $parkingFloor->getNomination(),
+                'parkingSpaces' => $parkingFloor->getParkingSpaces()
             ];
         }
 
 
         return new JsonResponse([
-            'status'=> JsonResponse::HTTP_OK,
+            'status' => JsonResponse::HTTP_OK,
             'parkingFloors' => $allParkingFloors
         ]);
     }
 
-    #[Route('/parking-floor-management/parking-floors', name: 'parking-floors.create', methods:'POST')]
+    #[Route('/parking-floor-management/parking-floors', name: 'parking-floors.create', methods: 'POST')]
     public function new(Request $request, ParksRepository $parksRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -67,22 +66,22 @@ class ParkingFloorController extends AbstractController
 
         $findParkById = $parksRepository->find($parkId);
 
-        if(empty($parkingFloorNomination)){
+        if (empty($parkingFloorNomination)) {
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'Parking Floor nomination can not be empty.'
+                'status' => JsonResponse::HTTP_BAD_REQUEST,
+                'message' => 'Parking Floor nomination can not be empty.'
             ]);
         }
 
-        if(!$findParkById){
+        if (!$findParkById) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'parking not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'parking not found.'
             ]);
         }
 
-        
+
 
         $newParkingFloor = new ParkingFloor();
 
@@ -91,10 +90,11 @@ class ParkingFloorController extends AbstractController
 
         $this->em->persist($newParkingFloor);
         $this->em->flush();
-        return new JsonResponse([
-            'status'=> JsonResponse::HTTP_CREATED,
-            'message' => 'New parking floor added successfully.'
-        ]
+        return new JsonResponse(
+            [
+                'status' => JsonResponse::HTTP_CREATED,
+                'message' => 'New parking floor added successfully.'
+            ]
         );
     }
 
@@ -102,34 +102,34 @@ class ParkingFloorController extends AbstractController
     public function edit(Request $request, int $id, ParksRepository $parksRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        
+
         $parkingFloorNomination = $data['nomination'];
         $parkId = $data['park_id'];
 
         $findParkById = $parksRepository->find($parkId);
 
-        if(!$findParkById){
+        if (!$findParkById) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'parking not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'parking not found.'
             ]);
         }
 
-        if(empty($parkingFloorNomination)){
+        if (empty($parkingFloorNomination)) {
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'Parking Floor nomination can not be empty.'
+                'status' => JsonResponse::HTTP_BAD_REQUEST,
+                'message' => 'Parking Floor nomination can not be empty.'
             ]);
         }
 
         $findParkingFloorById = $this->parkingFloorRepository->find($id);
 
-        if(!$findParkingFloorById){
+        if (!$findParkingFloorById) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'ressources not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'ressources not found.'
             ]);
         }
 
@@ -139,10 +139,11 @@ class ParkingFloorController extends AbstractController
         $this->em->persist($findParkingFloorById);
         $this->em->flush();
 
-        return new JsonResponse([
-            'status'=> JsonResponse::HTTP_OK,
-            'message' => 'parking floor updated successfully.'
-        ]
+        return new JsonResponse(
+            [
+                'status' => JsonResponse::HTTP_OK,
+                'message' => 'parking floor updated successfully.'
+            ]
         );
     }
 
@@ -152,11 +153,11 @@ class ParkingFloorController extends AbstractController
 
         $findParkingFloorById = $this->parkingFloorRepository->find($id);
 
-        if(!$findParkingFloorById){
+        if (!$findParkingFloorById) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'ressources not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'ressources not found.'
             ]);
         }
 

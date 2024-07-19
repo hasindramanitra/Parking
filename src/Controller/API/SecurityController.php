@@ -42,7 +42,7 @@ class SecurityController extends AbstractController
 
         if (!$user) {
             return new JsonResponse([
-                'status' => CodeStatus::STATUS_ERROR,
+                'status' => JsonResponse::HTTP_NOT_FOUND,
                 'message' => 'An error has occured.'
             ]);
         }
@@ -74,13 +74,12 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route('/reset-password/{token}', name: 'check.token', methods:['GET'])]
+    #[Route('/reset-password/{token}', name: 'check.token', methods: ['GET'])]
     public function checkToken(
         $token,
         JWTService $jwt,
 
-    ): JsonResponse
-    {
+    ): JsonResponse {
         if ($jwt->isValid($token) && !$jwt->isExpired($token) && $jwt->check($token, $this->getParameter('app.jwtsecret'))) {
 
             return new JsonResponse([
@@ -90,13 +89,12 @@ class SecurityController extends AbstractController
         }
 
         return new JsonResponse([
-            'status'=> JsonResponse::HTTP_FORBIDDEN,
-            'message'=> 'The delay for reset your password is over. Please resend the link.'
+            'status' => JsonResponse::HTTP_FORBIDDEN,
+            'message' => 'The delay for reset your password is over. Please resend the link.'
         ]);
-
     }
 
-    #[Route('/reset-password/{token}', name: 'reset.password', methods:['POST'])]
+    #[Route('/reset-password/{token}', name: 'reset.password', methods: ['POST'])]
     public function resetPassword(
         $token,
         JWTService $jwt,

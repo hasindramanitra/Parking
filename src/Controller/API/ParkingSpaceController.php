@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\API;
 
 use App\Entity\ParkingSpace;
@@ -19,51 +20,43 @@ class ParkingSpaceController extends AbstractController
 
     private $parkingSpaceRepository;
 
-    public function __construct(EntityManagerInterface $em, ParkingSpaceRepository $parkingSpaceRepository) {
+    public function __construct(EntityManagerInterface $em, ParkingSpaceRepository $parkingSpaceRepository)
+    {
 
         $this->em = $em;
 
         $this->parkingSpaceRepository = $parkingSpaceRepository;
-        
     }
 
-    #[Route('/parking-space-management/parking-spaces', name: 'parking-spaces.all', methods:['GET'])]
-    public function getAllParkingSpace(
-
-    ):JsonResponse
+    #[Route('/parking-space-management/parking-spaces', name: 'parking-spaces.all', methods: ['GET'])]
+    public function getAllParkingSpace(): JsonResponse
     {
         $parkingSpaces = $this->parkingSpaceRepository->findAll();
 
-        if(!$parkingSpaces){
+        if (!$parkingSpaces) {
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_NO_CONTENT,
-                'message'=> 'No parking spaces found in database.'
+                'status' => JsonResponse::HTTP_NO_CONTENT,
+                'message' => 'No parking spaces found in database.'
             ]);
         }
 
         $allParkingSpaces = [];
 
-        foreach($parkingSpaces as $parkingSpace){
+        foreach ($parkingSpaces as $parkingSpace) {
 
             $allParkingSpaces[] = [
-                'id'=> $parkingSpace->getId(),
-                'isAvailable'=> $parkingSpace->isAvalaibilityStatus(),
-                'parkingSpaceRating'=> $parkingSpace->getRate(),
-                'category'=> $parkingSpace->getCategorie()?->getName(),
+                'id' => $parkingSpace->getId(),
+                'isAvailable' => $parkingSpace->isAvalaibilityStatus(),
+                'parkingSpaceRating' => $parkingSpace->getRate(),
+                'category' => $parkingSpace->getCategorie()?->getName(),
                 'parkingFloor' => $parkingSpace->getParkingFloor()->getNomination()
             ];
         }
 
-        // return $this->json([
-        //     'Countries'=>$parkingSpaces
-        // ], 200, [], [ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => function($object){
-        //     return $object->getId();
-        // }]);
-
-         return new JsonResponse([
-             'status'=> JsonResponse::HTTP_OK,
-             'parkingSpaces' => $allParkingSpaces
-         ]);
+        return new JsonResponse([
+            'status' => JsonResponse::HTTP_OK,
+            'parkingSpaces' => $allParkingSpaces
+        ]);
     }
 
     #[Route('/parking-space-management/parking-spaces', name: 'parking-spaces.new', methods: ['POST'])]
@@ -71,8 +64,7 @@ class ParkingSpaceController extends AbstractController
         Request $request,
         ParkingFloorRepository $parkingFloorRepository,
         CategoryRepository $categoryRepository
-    ):JsonResponse
-    {
+    ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
         $availableStatus = $data['available'];
@@ -85,35 +77,35 @@ class ParkingSpaceController extends AbstractController
 
         $findCategoryById = $categoryRepository->find($categoryId);
 
-        if(!$findCategoryById){
+        if (!$findCategoryById) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'Category not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'Category not found.'
             ]);
         }
 
         $findParkingFloorById = $parkingFloorRepository->find($parkingFloorId);
 
-        if(!$findParkingFloorById){
+        if (!$findParkingFloorById) {
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'Parking floor not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'Parking floor not found.'
             ]);
         }
 
-        if(!is_bool($availableStatus)){
+        if (!is_bool($availableStatus)) {
 
-            return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'Available status must be a boolean value.'
-            ]);
-        }
-
-        if($parkingSpaceRate <= 0){
             return new JsonResponse([
                 'status' => JsonResponse::HTTP_BAD_REQUEST,
-                'message'=>'The rate of parking space must be positive.'
+                'message' => 'Available status must be a boolean value.'
+            ]);
+        }
+
+        if ($parkingSpaceRate <= 0) {
+            return new JsonResponse([
+                'status' => JsonResponse::HTTP_BAD_REQUEST,
+                'message' => 'The rate of parking space must be positive.'
             ]);
         }
 
@@ -128,10 +120,9 @@ class ParkingSpaceController extends AbstractController
         $this->em->flush();
 
         return new JsonResponse([
-            'status'=> JsonResponse::HTTP_CREATED,
-            'message'=> 'Parking space added successfully.'
+            'status' => JsonResponse::HTTP_CREATED,
+            'message' => 'Parking space added successfully.'
         ]);
-
     }
 
     #[Route('/parking-space-management/parking-spaces/12434{id}9909', name: 'parking-spaces.update', methods: ['PUT', 'PATCH'])]
@@ -140,8 +131,7 @@ class ParkingSpaceController extends AbstractController
         Request $request,
         ParkingFloorRepository $parkingFloorRepository,
         CategoryRepository $categoryRepository
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
         $availableStatus = $data['available'];
@@ -154,44 +144,44 @@ class ParkingSpaceController extends AbstractController
 
         $findCategoryById = $categoryRepository->find($categoryId);
 
-        if(!$findCategoryById){
+        if (!$findCategoryById) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'Category not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'Category not found.'
             ]);
         }
 
         $findParkingFloorById = $parkingFloorRepository->find($parkingFloorId);
 
-        if(!$findParkingFloorById){
+        if (!$findParkingFloorById) {
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'Parking floor not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'Parking floor not found.'
             ]);
         }
 
-        if(!is_bool($availableStatus)){
+        if (!is_bool($availableStatus)) {
 
-            return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'Available status must be a boolean value.'
-            ]);
-        }
-
-        if($parkingSpaceRate <= 0){
             return new JsonResponse([
                 'status' => JsonResponse::HTTP_BAD_REQUEST,
-                'message'=>'The rate of parking space must be positive.'
+                'message' => 'Available status must be a boolean value.'
+            ]);
+        }
+
+        if ($parkingSpaceRate <= 0) {
+            return new JsonResponse([
+                'status' => JsonResponse::HTTP_BAD_REQUEST,
+                'message' => 'The rate of parking space must be positive.'
             ]);
         }
 
         $findParkingSpaceById = $this->parkingSpaceRepository->find($id);
 
-        if(!$findParkingSpaceById){
+        if (!$findParkingSpaceById) {
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'ressources not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'ressources not found.'
             ]);
         }
 
@@ -204,23 +194,21 @@ class ParkingSpaceController extends AbstractController
         $this->em->flush();
 
         return new JsonResponse([
-            'status'=> JsonResponse::HTTP_OK,
-            'message'=> 'Parking space updated successfully.'
+            'status' => JsonResponse::HTTP_OK,
+            'message' => 'Parking space updated successfully.'
         ]);
-
     }
 
     #[Route('/parking-space-management/parking-spaces/12434{id}9909', name: 'parking-spaces.delete', methods: ['DELETE'])]
     public function delete(
         int $id
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $findParkingSpaceById = $this->parkingSpaceRepository->find($id);
 
-        if(!$findParkingSpaceById){
+        if (!$findParkingSpaceById) {
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=> 'ressources not found.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'ressources not found.'
             ]);
         }
 
@@ -228,9 +216,8 @@ class ParkingSpaceController extends AbstractController
         $this->em->flush();
 
         return new JsonResponse([
-            'status'=> JsonResponse::HTTP_OK,
-            'message'=> 'ressources deleted successfully.'
+            'status' => JsonResponse::HTTP_OK,
+            'message' => 'ressources deleted successfully.'
         ]);
-
     }
 }

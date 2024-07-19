@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\API;
 
 use App\Entity\Category;
@@ -23,18 +24,17 @@ class CategoryController extends AbstractController
         $this->categorieRepository = $categorieRepository;
     }
 
-    #[Route('/category-management/categories', name: 'categories.all', methods:'GET')]
+    #[Route('/category-management/categories', name: 'categories.all', methods: 'GET')]
     public function getAllCategories(
         SerializerInterface $serializerInterface
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $categories = $this->categorieRepository->findAll();
 
-        if(!$categories){
+        if (!$categories) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_NO_CONTENT,
-                'message'=> 'No category found in database.'
+                'status' => JsonResponse::HTTP_NO_CONTENT,
+                'message' => 'No category found in database.'
             ]);
         }
 
@@ -42,7 +42,7 @@ class CategoryController extends AbstractController
         return new JsonResponse($jsonCategories, JsonResponse::HTTP_OK, [], true);
     }
 
-    #[Route('/category-management/categories', name: 'categories.create', methods:'POST')]
+    #[Route('/category-management/categories', name: 'categories.create', methods: 'POST')]
     public function new(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -79,10 +79,11 @@ class CategoryController extends AbstractController
 
         $this->em->persist($newCategory);
         $this->em->flush();
-        return new JsonResponse([
-            'status'=> JsonResponse::HTTP_CREATED,
-            'message' => 'New category added successfully.'
-        ]
+        return new JsonResponse(
+            [
+                'status' => JsonResponse::HTTP_CREATED,
+                'message' => 'New category added successfully.'
+            ]
         );
     }
 
@@ -117,7 +118,7 @@ class CategoryController extends AbstractController
 
         $categoryFindById = $this->categorieRepository->find($id);
 
-        if(!$categoryFindById){
+        if (!$categoryFindById) {
             return new JsonResponse([
                 'status' => JsonResponse::HTTP_NOT_FOUND,
                 'message' => 'ressources not found.'
@@ -130,10 +131,11 @@ class CategoryController extends AbstractController
 
         $this->em->persist($categoryFindById);
         $this->em->flush();
-        return new JsonResponse([
-            'status'=> JsonResponse::HTTP_OK,
-            'message' => 'Category updated successfully.'
-        ]
+        return new JsonResponse(
+            [
+                'status' => JsonResponse::HTTP_OK,
+                'message' => 'Category updated successfully.'
+            ]
         );
     }
 
@@ -143,7 +145,7 @@ class CategoryController extends AbstractController
 
         $categoryFindById = $this->categorieRepository->find($id);
 
-        if(!$categoryFindById){
+        if (!$categoryFindById) {
             return new JsonResponse([
                 'status' => JsonResponse::HTTP_NOT_FOUND,
                 'message' => 'ressources not found.'
