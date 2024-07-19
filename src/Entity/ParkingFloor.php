@@ -16,19 +16,17 @@ class ParkingFloor
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $location = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $alphabetName = null;
+    private ?string $nomination = null;
 
     /**
      * @var Collection<int, ParkingSpace>
      */
     #[ORM\OneToMany(targetEntity: ParkingSpace::class, mappedBy: 'parkingFloor', orphanRemoval: true)]
     private Collection $parkingSpaces;
+
+    #[ORM\ManyToOne(inversedBy: 'parkingFloors')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Parks $parks = null;
 
     public function __construct()
     {
@@ -40,38 +38,14 @@ class ParkingFloor
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getNomination(): ?string
     {
-        return $this->name;
+        return $this->nomination;
     }
 
-    public function setName(string $name): static
+    public function setNomination(string $nomination): static
     {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getLocation(): ?string
-    {
-        return $this->location;
-    }
-
-    public function setLocation(string $location): static
-    {
-        $this->location = $location;
-
-        return $this;
-    }
-
-    public function getAlphabetName(): ?string
-    {
-        return $this->alphabetName;
-    }
-
-    public function setAlphabetName(string $alphabetName): static
-    {
-        $this->alphabetName = $alphabetName;
+        $this->nomination = $nomination;
 
         return $this;
     }
@@ -102,6 +76,18 @@ class ParkingFloor
                 $parkingSpace->setParkingFloor(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getParks(): ?Parks
+    {
+        return $this->parks;
+    }
+
+    public function setParks(?Parks $parks): static
+    {
+        $this->parks = $parks;
 
         return $this;
     }
