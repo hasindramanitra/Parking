@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\API;
 
 use App\Entity\Cities;
@@ -28,41 +29,34 @@ class CitiesController extends AbstractController
         $this->countrieRepository = $countrieRepository;
     }
 
-   #[Route('/citie-management/cities', name: 'cities.all', methods: ['GET'])]
-    public function getAllCities(
-    ): JsonResponse
+    #[Route('/citie-management/cities', name: 'cities.all', methods: ['GET'])]
+    public function getAllCities(): JsonResponse
     {
         $cities = $this->citiesRepository->findAll();
 
-        if(!$cities){
+        if (!$cities) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_NO_CONTENT,
-                'message'=> 'No city found in database.'
+                'status' => JsonResponse::HTTP_NO_CONTENT,
+                'message' => 'No city found in database.'
             ]);
         }
 
         $AllCities = [];
-        foreach($cities as $citie){
+        foreach ($cities as $citie) {
 
-            $AllCities[] =[
-                'id'=> $citie->getId(),
-                'citieName'=> $citie->getCitieName(),
-                'citieCode'=> $citie->getCitieCode(),
-                'countrie'=> $citie->getCountries()?->getCountrieName()
+            $AllCities[] = [
+                'id' => $citie->getId(),
+                'citieName' => $citie->getCitieName(),
+                'citieCode' => $citie->getCitieCode(),
+                'countrie' => $citie->getCountries()?->getCountrieName()
             ];
         }
 
-        return $this->json(['cities'=>$AllCities], 200);
-
-        // return $this->json([
-        //     'Cities'=>$cities
-        // ], 200, [], [ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => function($object){
-        //     return $object->getId();
-        // }]);
+        return $this->json(['cities' => $AllCities], 200);
     }
 
-    #[Route('/citie-management/cities', name: 'cities.create', methods:'POST')]
+    #[Route('/citie-management/cities', name: 'cities.create', methods: 'POST')]
     public function new(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -71,21 +65,21 @@ class CitiesController extends AbstractController
         $citieCode = $data['citie_code'];
         $countrieId = $data['countrie_id'];
 
-        if($countrieId === null){
+        if ($countrieId === null) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=>'Countrie ID can not be null.'
+                'status' => JsonResponse::HTTP_BAD_REQUEST,
+                'message' => 'Countrie ID can not be null.'
             ]);
         }
 
         $countrieFindById = $this->countrieRepository->find($countrieId);
 
-        if(!$countrieFindById){
+        if (!$countrieFindById) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=>'No countrie found with that ID.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'No countrie found with that ID.'
             ]);
         }
 
@@ -110,10 +104,11 @@ class CitiesController extends AbstractController
 
         $this->em->persist($newCitie);
         $this->em->flush();
-        return new JsonResponse([
-            'status'=> JsonResponse::HTTP_CREATED,
-            'message' => 'New countrie added successfully.'
-        ]
+        return new JsonResponse(
+            [
+                'status' => JsonResponse::HTTP_CREATED,
+                'message' => 'New countrie added successfully.'
+            ]
         );
     }
 
@@ -126,21 +121,21 @@ class CitiesController extends AbstractController
         $citieCode = $data['citie_code'];
         $countrieId = $data['countrie_id'];
 
-        if($countrieId === null){
+        if ($countrieId === null) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=>'Countrie ID can not be null.'
+                'status' => JsonResponse::HTTP_BAD_REQUEST,
+                'message' => 'Countrie ID can not be null.'
             ]);
         }
 
         $countrieFindById = $this->countrieRepository->find($countrieId);
 
-        if(!$countrieFindById){
+        if (!$countrieFindById) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_BAD_REQUEST,
-                'message'=>'No countrie found with that ID.'
+                'status' => JsonResponse::HTTP_NOT_FOUND,
+                'message' => 'No countrie found with that ID.'
             ]);
         }
 
@@ -159,7 +154,7 @@ class CitiesController extends AbstractController
 
         $citieFindById = $this->citiesRepository->find($id);
 
-        if(!$citieFindById){
+        if (!$citieFindById) {
             return new JsonResponse([
                 'status' => JsonResponse::HTTP_NOT_FOUND,
                 'message' => 'ressources not found.'
@@ -172,10 +167,11 @@ class CitiesController extends AbstractController
 
         $this->em->persist($citieFindById);
         $this->em->flush();
-        return new JsonResponse([
-            'status'=> JsonResponse::HTTP_OK,
-            'message' => 'Citie updated successfully.'
-        ]
+        return new JsonResponse(
+            [
+                'status' => JsonResponse::HTTP_OK,
+                'message' => 'Citie updated successfully.'
+            ]
         );
     }
 
@@ -185,7 +181,7 @@ class CitiesController extends AbstractController
 
         $citieFindById = $this->citiesRepository->find($id);
 
-        if(!$citieFindById){
+        if (!$citieFindById) {
             return new JsonResponse([
                 'status' => JsonResponse::HTTP_NOT_FOUND,
                 'message' => 'ressources not found.'

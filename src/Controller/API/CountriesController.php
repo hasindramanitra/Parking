@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\API;
 
 use App\Entity\Countries;
@@ -23,31 +24,27 @@ class CountriesController extends AbstractController
         $this->countriesRepository = $countriesRepository;
     }
 
-   #[Route('/countrie-management/countries', name: 'countries.all', methods: ['GET'])]
-    public function getAllCountries(
-
-    ): JsonResponse
+    #[Route('/countrie-management/countries', name: 'countries.all', methods: ['GET'])]
+    public function getAllCountries(): JsonResponse
     {
         $countries = $this->countriesRepository->findAll();
 
-        if(!$countries){
+        if (!$countries) {
 
             return new JsonResponse([
-                'status'=> JsonResponse::HTTP_NO_CONTENT,
-                'message'=> 'No countrie found in database.'
+                'status' => JsonResponse::HTTP_NO_CONTENT,
+                'message' => 'No countrie found in database.'
             ]);
         }
 
-
-        //return new JsonResponse($jsonCountries, JsonResponse::HTTP_OK, [], true);
         return $this->json([
-            'Countries'=>$countries
-        ], 200, [], [ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => function($object){
+            'Countries' => $countries
+        ], 200, [], [ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
             return $object->getId();
         }]);
     }
 
-    #[Route('/countrie-management/countries', name: 'countries.create', methods:'POST')]
+    #[Route('/countrie-management/countries', name: 'countries.create', methods: 'POST')]
     public function new(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -75,10 +72,11 @@ class CountriesController extends AbstractController
 
         $this->em->persist($newCountrie);
         $this->em->flush();
-        return new JsonResponse([
-            'status'=> JsonResponse::HTTP_CREATED,
-            'message' => 'New countrie added successfully.'
-        ]
+        return new JsonResponse(
+            [
+                'status' => JsonResponse::HTTP_CREATED,
+                'message' => 'New countrie added successfully.'
+            ]
         );
     }
 
@@ -105,7 +103,7 @@ class CountriesController extends AbstractController
 
         $countrieFindById = $this->countriesRepository->find($id);
 
-        if(!$countrieFindById){
+        if (!$countrieFindById) {
             return new JsonResponse([
                 'status' => JsonResponse::HTTP_NOT_FOUND,
                 'message' => 'ressources not found.'
@@ -117,10 +115,11 @@ class CountriesController extends AbstractController
 
         $this->em->persist($countrieFindById);
         $this->em->flush();
-        return new JsonResponse([
-            'status'=> JsonResponse::HTTP_OK,
-            'message' => 'Countrie updated successfully.'
-        ]
+        return new JsonResponse(
+            [
+                'status' => JsonResponse::HTTP_OK,
+                'message' => 'Countrie updated successfully.'
+            ]
         );
     }
 
@@ -130,7 +129,7 @@ class CountriesController extends AbstractController
 
         $countrieFindById = $this->countriesRepository->find($id);
 
-        if(!$countrieFindById){
+        if (!$countrieFindById) {
             return new JsonResponse([
                 'status' => JsonResponse::HTTP_NOT_FOUND,
                 'message' => 'ressources not found.'
