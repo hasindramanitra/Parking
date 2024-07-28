@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ParksController extends AbstractController
 {
@@ -27,11 +28,13 @@ class ParksController extends AbstractController
         $this->parksRepository = $parksRepository;
     }
 
-    #[Route('/parkings-management/parkings', name: 'parkings.all', methods: ['GET'])]
-    public function getAllParks(): JsonResponse
+    #[Route('/parkings-management/parkings/{id}', name: 'parking.by.countrie', methods:['POST'])]
+    public function getParkingsByCountrie(
+        int $id
+    ):JsonResponse
     {
-        $parkings = $this->parksRepository->findAll();
 
+        $parkings = $this->parksRepository->findAllParkingsByCountrieWithCountrieId($id);
         if (!$parkings) {
 
             return new JsonResponse([
@@ -41,21 +44,47 @@ class ParksController extends AbstractController
         }
 
         $allParkings = [];
-
-        foreach ($parkings as $parking) {
+        foreach($parkings as $parking){
             $allParkings[] = [
-                'id' => $parking->getId(),
-                'location' => $parking->getLocation(),
-                'citie' => $parking->getCities()?->getCitieName(),
-                'parkingFloor' => $parking->getParkingFloors()
+                'id'=> $parking->getId(),
+                'location'=> $parking->getLocation(),
+                'citie'=> $parking->getCities()?->getCitieName(),
+                'countrie'=>$parking->getCities()->getCountries()->getCountrieName()
             ];
         }
-
-
         return new JsonResponse([
-            'status' => JsonResponse::HTTP_OK,
-            'parkings' => $allParkings
+            'status'=> JsonResponse::HTTP_OK,
+            'parkings'=> $allParkings
         ]);
+    }
+
+    #[Route('/parkings-management/parkings', name: 'parkings.all', methods: ['GET'])]
+    public function getAllParks(
+    ): JsonResponse
+    {
+        $parkings = $this->parksRepository->findAll();
+
+
+        if (!$parkings) {
+
+            return new JsonResponse([
+                'status' => JsonResponse::HTTP_NO_CONTENT,
+                'message' => 'No parking found in database.'
+            ]);
+        }
+
+         $allParkings = [];
+         foreach($parkings as $parking){
+             $allParkings[] = [
+                 'id'=> $parking->getId(),
+                 'location'=> $parking->getLocation(),
+                 'citie'=> $parking->getCities()?->getCitieName()
+             ];
+         }
+         return new JsonResponse([
+             'status'=> JsonResponse::HTTP_OK,
+             'parkings'=> $allParkings
+         ]);
     }
 
     #[Route('/parkings-management/parkings', name: 'parkings.create', methods: 'POST')]

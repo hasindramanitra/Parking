@@ -28,6 +28,60 @@ class ParkingSpaceController extends AbstractController
         $this->parkingSpaceRepository = $parkingSpaceRepository;
     }
 
+    #[Route('/parking-space-management/parking-spaces', name: 'search.by.countrie.and.cities', methods: ['POST'])]
+    public function getAllParkingByCountrieNameAndCitieName(
+        Request $request
+    ):JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $countrieName = $data['countrieName'];
+
+        if($countrieName === "" || $countrieName < 4){
+            return new JsonResponse([
+                'status'=>JsonResponse::HTTP_BAD_REQUEST,
+                'message'=>'Please, the countrie name must more 4 characters.'
+            ]);
+        }
+        $citieName = $data['citieName'];
+
+        if($citieName === "" || $citieName < 4){
+            return new JsonResponse([
+                'status'=>JsonResponse::HTTP_BAD_REQUEST,
+                'message'=>'Please, the citie name must more 4 characters.'
+            ]);
+        }
+
+        $parkingSpacesByCountrieAndCities = $this->parkingSpaceRepository->findAllParkingSpaceByCountrieNameAndCityName($countrieName,$citieName);
+
+        if (!$parkingSpacesByCountrieAndCities) {
+            return new JsonResponse([
+                'status' => JsonResponse::HTTP_NO_CONTENT,
+                'message' => 'No parking spaces found in database.'
+            ]);
+        }
+
+        $allParkingSpaces = [];
+
+        foreach ($parkingSpacesByCountrieAndCities as $parkingSpacesByCountrieAndCitie) {
+
+            $allParkingSpaces[] = [
+                'id' => $parkingSpacesByCountrieAndCitie['id'],
+                'identification'=> $parkingSpacesByCountrieAndCitie['identification'],
+                'parkingCategory'=>$parkingSpacesByCountrieAndCitie['name'],
+                'rate' => $parkingSpacesByCountrieAndCitie['rate'],
+                'parkingLocalisation' => $parkingSpacesByCountrieAndCitie['location'],
+                'citieName' => $parkingSpacesByCountrieAndCitie['citieName'],
+                'countrieName' => $parkingSpacesByCountrieAndCitie['countrieName']
+            ];
+        }
+
+        return new JsonResponse([
+            'status' => JsonResponse::HTTP_OK,
+            'parkingSpaces' => $allParkingSpaces
+        ]);
+    }
+
     #[Route('/parking-space-management/parking-spaces', name: 'parking-spaces.all', methods: ['GET'])]
     public function getAllParkingSpace(): JsonResponse
     {
@@ -46,6 +100,7 @@ class ParkingSpaceController extends AbstractController
 
             $allParkingSpaces[] = [
                 'id' => $parkingSpace->getId(),
+                'identification'=> $parkingSpace->getIdentification(),
                 'isAvailable' => $parkingSpace->isAvalaibilityStatus(),
                 'parkingSpaceRating' => $parkingSpace->getRate(),
                 'category' => $parkingSpace->getCategorie()?->getName(),
@@ -68,6 +123,8 @@ class ParkingSpaceController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         $availableStatus = $data['available'];
+
+        $identification = $data['identification'];
 
         $parkingSpaceRate = $data['rate'];
 
@@ -112,6 +169,7 @@ class ParkingSpaceController extends AbstractController
         $newParkingSpace = new ParkingSpace();
 
         $newParkingSpace->setAvalaibilityStatus($availableStatus)
+            ->setIdentification($identification)
             ->setRate($parkingSpaceRate)
             ->setCategorie($findCategoryById)
             ->setParkingFloor($findParkingFloorById);
@@ -135,6 +193,8 @@ class ParkingSpaceController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         $availableStatus = $data['available'];
+
+        $identification = $data['identification'];
 
         $parkingSpaceRate = $data['rate'];
 
@@ -186,6 +246,7 @@ class ParkingSpaceController extends AbstractController
         }
 
         $findParkingSpaceById->setAvalaibilityStatus($availableStatus)
+            ->setIdentification($identification)
             ->setRate($parkingSpaceRate)
             ->setCategorie($findCategoryById)
             ->setParkingFloor($findParkingFloorById);

@@ -37,11 +37,19 @@ class CountriesController extends AbstractController
             ]);
         }
 
-        return $this->json([
-            'Countries' => $countries
-        ], 200, [], [ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
-            return $object->getId();
-        }]);
+        $allCountries = [];
+        foreach($countries as $countrie){
+            $allCountries[] = [
+                'id'=> $countrie->getId(),
+                'countrieName'=> $countrie->getCountrieName(),
+                'countrieCode'=> $countrie->getCountrieCode()
+            ];
+        }
+
+        return new JsonResponse([
+            'status'=> JsonResponse::HTTP_OK,
+            'countries'=> $allCountries
+        ]);
     }
 
     #[Route('/countrie-management/countries', name: 'countries.create', methods: 'POST')]

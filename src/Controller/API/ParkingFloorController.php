@@ -45,6 +45,7 @@ class ParkingFloorController extends AbstractController
             $allParkingFloors[] = [
                 'id' => $parkingFloor->getId(),
                 'nomination' => $parkingFloor->getNomination(),
+                'parking'=>$parkingFloor->getParks()?->getId(),
                 'parkingSpaces' => $parkingFloor->getParkingSpaces()
             ];
         }
