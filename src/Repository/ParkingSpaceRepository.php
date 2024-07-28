@@ -16,6 +16,9 @@ class ParkingSpaceRepository extends ServiceEntityRepository
         parent::__construct($registry, ParkingSpace::class);
     }
 
+
+ 
+
     //    /**
     //     * @return ParkingSpace[] Returns an array of ParkingSpace objects
     //     */
