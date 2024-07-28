@@ -27,6 +27,9 @@ class ParkingSpace
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $Categorie = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $identification = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -76,6 +79,18 @@ class ParkingSpace
     public function setCategorie(?Category $Categorie): static
     {
         $this->Categorie = $Categorie;
+
+        return $this;
+    }
+
+    public function getIdentification(): ?string
+    {
+        return $this->identification;
+    }
+
+    public function setIdentification(string $identification): static
+    {
+        $this->identification = $identification;
 
         return $this;
     }
